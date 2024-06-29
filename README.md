@@ -31,7 +31,7 @@ This project is a full-fledged eCommerce application built using the MERN stack 
 
 ## Installation
 
- - **Clone the repository**: 
+ - **Clone the repository**:
 For backend: `git clone https://github.com/Dhruv1420/Ecommerce24-Server.git`
 For frontend: `git clone https://github.com/Dhruv1420/Ecommerce24-Client.git`
 
@@ -39,7 +39,7 @@ For frontend: `git clone https://github.com/Dhruv1420/Ecommerce24-Client.git`
 For backend dependencies: `cd server npm install`
 For frontend dependencies: `cd client npm install`
 
- - **Set up Environment Variables**: Make sure to create a `.env` file in the `server` directory and add appropriate variabels in order to use the app:
+ - **Set up Environment Variables**: Make sure to create a `.env` file in the `server` directory and add appropriate variables to use the app:
 
    - PORT = `3000 or any`
    - MONGO_URL = `mongodb://localhost:27017 or cloud uri`
@@ -59,4 +59,4 @@ For frontend: 	`cd client npm start`
 **LinkedIn** Click [Here](https://www.linkedin.com/in/dhruv1420/)
 
 ## Contact
-For any questions or feedback, please contact on kirangupta1218@gmail.com
+For any questions or feedback, please contact kirangupta1218@gmail.com
