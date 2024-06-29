@@ -42,13 +42,14 @@ For frontend dependencies: `cd client npm install`
  - **Set up Environment Variables**: Make sure to create a `.env` file in the `server` directory and add appropriate variables to use the app:
 
    - PORT = `3000 or any`
-   - MONGO_URL = `mongodb://localhost:27017 or cloud uri`
+   - MONGO_URI = `mongodb://localhost:27017 or cloud uri`
    - STRIPE_KEY = `stripe secret key` 
    - PRODUCT_PER_PAGE = `8 or any`
 
-- **Run the development server**:
-For backend: `cd server npm run dev`
-For frontend: 	`cd client npm start`
+- **Run the development server**:<br />
+Build Command: `npm install && mkdir -p uploads && npm run build`<br />
+Start Command: `cd server node dist/app.js`<br />
+For frontend: 	`cd client npm run dev`
 
 - Open your browser and navigate to `http://localhost:3000` (Change Port if it is other than 3000).
 
