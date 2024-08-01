@@ -7,12 +7,13 @@ import ErrorHandler from "../utils/utility-class.js";
 import { invalidateCache } from "../utils/features.js";
 
 export const createPaymentIntent = TryCatch(async (req, res, next) => {
-  const { amount } = req.body;
+  let { amount } = req.body;
   
   if (!amount) return next(new ErrorHandler("Please enter Amount!", 400));
+  amount = Number(amount);
 
   const paymentIntent = await stripe.paymentIntents.create({
-    amount: Number(amount) * 100,
+    amount: amount.toFixed(2) * 100,
     currency: "gbp",
   });
 
