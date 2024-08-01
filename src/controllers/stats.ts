@@ -122,8 +122,10 @@ export const getDashboardStats = TryCatch(async (req, res, next) => {
       0
     );
 
+    const revenuePercent = calculatePercentage(thisMonthRevenue, lastMonthRevenue).toFixed(0);
+
     const changePercent = {
-      revenue: calculatePercentage(thisMonthRevenue, lastMonthRevenue),
+      revenue:  Number(revenuePercent) >= 10000 ? "9999+" : revenuePercent,
       product: calculatePercentage(
         thisMonthProducts.length,
         lastMonthProducts.length
@@ -141,7 +143,7 @@ export const getDashboardStats = TryCatch(async (req, res, next) => {
     );
 
     const count = {
-      revenue,
+      revenue: revenue.toFixed(2),
       product: productsCount,
       user: usersCount,
       order: allOrders.length,
@@ -186,7 +188,7 @@ export const getDashboardStats = TryCatch(async (req, res, next) => {
         revenue: monthlyRevenue,
       },
       usersRatio,
-      latestTransactions: modifiedLatestTransactions,
+      latestTransactions: modifiedLatestTransactions.reverse(),
     };
 
     myCache.set(key, JSON.stringify(stats));

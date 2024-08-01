@@ -9,6 +9,7 @@ import {
   getSingleProduct,
   newProduct,
   updateProduct,
+  getProductsByCategory,  // Import the new controller function
 } from "../controllers/product.js";
 import { singleUpload } from "../middlewares/multer.js";
 
@@ -28,6 +29,9 @@ app.get("/categories", getAllCategories);
 
 // to get all products
 app.get("/admin-products", AdminOnly, getAdminProducts);
+
+// to get products by category
+app.get("/category/:category", getProductsByCategory);  // New route for category-based product fetching
 
 // to get, update and delete
 app

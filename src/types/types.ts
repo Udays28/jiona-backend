@@ -14,7 +14,11 @@ export interface NewProductRequestBody {
   category: string;
   price: number;
   stock: number;
+  description: string;
+  size: string;
+  color: string;
 }
+
 
 export interface NewCouponRequestBody {
   code: string;

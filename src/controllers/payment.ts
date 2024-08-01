@@ -8,12 +8,12 @@ import { invalidateCache } from "../utils/features.js";
 
 export const createPaymentIntent = TryCatch(async (req, res, next) => {
   const { amount } = req.body;
-
+  
   if (!amount) return next(new ErrorHandler("Please enter Amount!", 400));
 
   const paymentIntent = await stripe.paymentIntents.create({
     amount: Number(amount) * 100,
-    currency: "inr",
+    currency: "gbp",
   });
 
   res.status(201).json({
@@ -42,6 +42,10 @@ export const newCoupon = TryCatch(
 
 export const applyDiscount = TryCatch(async (req, res, next) => {
   const { coupon } = req.query;
+  if(!coupon) return res.status(200).json({
+    success: true,
+    discount: 0,
+  })
 
   const discount = await Coupon.findOne({ code: coupon });
 

@@ -23,6 +23,19 @@ const schema = new mongoose.Schema(
       required: [true, "Please enter Category"],
       trim: true,
     },
+    description: {
+      type: String,
+      required: [true, "Please enter Description"],
+    },
+    size: {
+      type: String,
+      enum: ["XS", "S", "M", "L", "XL", "XXL", "regular"],
+      default: "regular",
+    },
+    color: {
+      type: String,
+      required: [true, "Please enter Color"],
+    },
   },
   {
     timestamps: true,

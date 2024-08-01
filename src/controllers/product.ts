@@ -1,24 +1,20 @@
-import { Request } from "express";
+import { Request, Response, NextFunction } from "express";
 import { TryCatch } from "../middlewares/error.js";
-import {
-  BaseQuery,
-  NewProductRequestBody,
-  SearchRequestQuery,
-} from "../types/types.js";
 import { Product } from "../models/product.js";
+import { myCache } from "../app.js";
+import { BaseQuery, NewProductRequestBody, SearchRequestQuery } from "../types/types.js";
 import ErrorHandler from "../utils/utility-class.js";
 import { rm } from "fs";
-import { myCache } from "../app.js";
 import { invalidateCache } from "../utils/features.js";
 
 // Revalidate on New, Update, Delete Product and on new order
-export const getLatestProduct = TryCatch(async (req, res, next) => {
+export const getLatestProduct = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
   let products;
 
   if (myCache.has("latest-products"))
     products = JSON.parse(myCache.get("latest-products") as string);
   else {
-    products = await Product.find({}).sort({ createdAt: -1 }).limit(5);
+    products = await Product.find({}).sort({ createdAt: -1 }).limit(10);
     myCache.set("latest-products", JSON.stringify(products));
   }
 
@@ -29,7 +25,7 @@ export const getLatestProduct = TryCatch(async (req, res, next) => {
 });
 
 // Revalidate on New, Update, Delete Product and on new order
-export const getAllCategories = TryCatch(async (req, res, next) => {
+export const getAllCategories = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
   let categories;
 
   if (myCache.has("categories"))
@@ -46,13 +42,13 @@ export const getAllCategories = TryCatch(async (req, res, next) => {
 });
 
 // Revalidate on New, Update, Delete Product and on new order
-export const getAdminProducts = TryCatch(async (req, res, next) => {
+export const getAdminProducts = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
   let products;
 
   if (myCache.has("admin-products"))
     products = JSON.parse(myCache.get("admin-products") as string);
   else {
-    products = await Product.find({});
+    products = await Product.find({}).sort({createdAt: -1});
     myCache.set("admin-products", JSON.stringify(products));
   }
 
@@ -63,7 +59,7 @@ export const getAdminProducts = TryCatch(async (req, res, next) => {
 });
 
 // Revalidate on New, Update, Delete Product and on new order
-export const getSingleProduct = TryCatch(async (req, res, next) => {
+export const getSingleProduct = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
   let product;
   const id = req.params.id;
 
@@ -81,14 +77,38 @@ export const getSingleProduct = TryCatch(async (req, res, next) => {
   });
 });
 
+// Revalidate on New, Update, Delete Product and on new order
+export const getProductsByCategory = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
+  const category = req.params.category;
+  console.log(category);
+
+  if (!category) return next(new ErrorHandler("Category parameter is required", 400));
+
+  let products;
+  const key = `category-products-${category}`;
+
+  // Try fetching from cache
+  if (myCache.has(key)) {
+    products = JSON.parse(myCache.get(key) as string);
+  } else {
+    products = await Product.find({ category: category.toLowerCase() });
+    myCache.set(key, JSON.stringify(products));
+  }
+
+  return res.status(200).json({
+    success: true,
+    products,
+  });
+});
+
 export const newProduct = TryCatch(
-  async (req: Request<{}, {}, NewProductRequestBody>, res, next) => {
-    const { name, category, price, stock } = req.body;
+  async (req: Request<{}, {}, NewProductRequestBody>, res: Response, next: NextFunction) => {
+    const { name, category, price, stock, description, size, color } = req.body;
     const photo = req.file;
 
     if (!photo) return next(new ErrorHandler("Please Add Photo!", 400));
 
-    if (!name || !category || !price || !stock) {
+    if (!name || !category || !price || !stock || !description || !size || !color) {
       rm(photo.path, () => {
         console.log("Deleted!");
       });
@@ -101,10 +121,13 @@ export const newProduct = TryCatch(
       category: category.toLowerCase(),
       price,
       stock,
+      description,
+      size,
+      color,
       photo: photo.path,
     });
 
-    invalidateCache({ product: true, admin: true });
+    invalidateCache({ product: true, admin: true})
 
     return res.status(201).json({
       success: true,
@@ -113,7 +136,7 @@ export const newProduct = TryCatch(
   }
 );
 
-export const updateProduct = TryCatch(async (req, res, next) => {
+export const updateProduct = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
   const { name, category, price, stock } = req.body;
   const photo = req.file;
@@ -130,7 +153,7 @@ export const updateProduct = TryCatch(async (req, res, next) => {
   }
 
   if (name) product.name = name;
-  if (category) product.category = category;
+  if (category) product.category = category.toLowerCase();
   if (price) product.price = price;
   if (stock) product.stock = stock;
 
@@ -148,7 +171,7 @@ export const updateProduct = TryCatch(async (req, res, next) => {
   });
 });
 
-export const deleteProduct = TryCatch(async (req, res, next) => {
+export const deleteProduct = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
   const product = await Product.findById(req.params.id);
 
   if (!product) return next(new ErrorHandler("Product Not Found!", 404));
@@ -172,12 +195,12 @@ export const deleteProduct = TryCatch(async (req, res, next) => {
 });
 
 export const getAllProducts = TryCatch(
-  async (req: Request<{}, {}, {}, SearchRequestQuery>, res, next) => {
+  async (req: Request<{}, {}, {}, SearchRequestQuery>, res: Response, next: NextFunction) => {
     const { search, category, price, sort } = req.query;
 
     const page = Number(req.query.page) || 1;
 
-    const limit = Number(process.env.PRODUCT_PER_PAGE) || 8;
+    const limit = Number(process.env.PRODUCT_PER_PAGE) || 20;
     const skip = (page - 1) * limit;
 
     const baseQuery: BaseQuery = {};
