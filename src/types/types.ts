@@ -67,6 +67,7 @@ export type OrderItemsType = {
 };
 
 export type ShippingInfoProps = {
+  phoneNumber: string;
   address: string;
   city: string;
   state: string;
