@@ -72,7 +72,7 @@ export type ShippingInfoProps = {
   city: string;
   state: string;
   country: string;
-  pinCode: number;
+  pinCode: string;
 };
 
 export interface NewOrderRequestBody {

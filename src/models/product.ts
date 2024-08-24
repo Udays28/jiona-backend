@@ -29,7 +29,6 @@ const schema = new mongoose.Schema(
     },
     size: {
       type: String,
-      enum: ["XS", "S", "M", "L", "XL", "XXL", "regular"],
       default: "regular",
     },
     color: {
